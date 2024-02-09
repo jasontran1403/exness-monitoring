@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8" />
+        <title>Exness Controller</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta content="Exness Controller" name="description" />
+        <meta content="ExnessController" name="author" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+        <!-- App favicon -->
+        <link rel="shortcut icon" href="/images/favicon.ico">
+
+        <!-- App css -->
+        <link href="/plugins/datatables/dataTables.bootstrap4.css" rel="stylesheet" type="text/css" />
+        <link href="/plugins/datatables/responsive.bootstrap4.css" rel="stylesheet" type="text/css" />
+        <link href="/plugins/datatables/buttons.bootstrap4.css" rel="stylesheet" type="text/css" />
+        <link href="/plugins/datatables/select.bootstrap4.css" rel="stylesheet" type="text/css" />
+
+        <!-- App css -->
+        <link href="/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+        <link href="/css/icons.min.css" rel="stylesheet" type="text/css" />
+        <link href="/css/theme.min.css" rel="stylesheet" type="text/css" />
+        <link href="/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+        <link href="/css/icons.min.css" rel="stylesheet" type="text/css" />
+        <link href="/css/theme.min.css" rel="stylesheet" type="text/css" />
+        <style>
+        	text[text-anchor="middle"]{
+			    opacity: 0;
+			}
+			        	
+        </style>
+
+    </head>
+
+    <body>
+
+        <!-- Begin page -->
+        <div id="layout-wrapper">
+
+            <div class="main-content">
+                <div class="page-content">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-lg-12">
+
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+											    <div id="chart1">
+											        <div id="morris-bar-example" class="morris-chart"></div>
+											    </div>
+											    <div class="mt-3" style="text-align: center">
+											        <button id="prevPage" class="btn btn-primary mr-2">Trang trước</button>
+											        <button id="nextPage" class="btn btn-primary">Trang sau</button>
+											    </div>
+											</div>
+
+
+                                        </div>
+                                    </div>
+                                    <!--end card body-->
+                                </div> <!-- end card-->
+                            </div> <!-- end col -->
+                        </div>
+                        <!--end row-->
+						
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <table id="datatable-buttons" class="table table-striped dt-responsive nowrap">
+                                            <thead>
+                                                <tr>
+                                                    <th>Exness ID#</th>
+                                                    <th>Tổng vốn</th>
+                                                    <th>Tổng LOT</th>
+                                                    <th>Tổng equity</th>
+                                                    <th>Trạng thái</th>
+                                                    <th></th>
+                                                    <th></th>
+                                                </tr>
+                                            </thead>
+                                        
+                                            <tbody>
+                                                <tr th:each="item : ${result}">
+                                                    <td><span th:text="${item.exnessId}"></span></td>
+                                                    <td><span th:inline="text">[[${#numbers.formatDecimal(item.balance, 0, 'COMMA', 2, 'POINT')}]]</span></td>
+                                                    <td><span th:inline="text">[[${#numbers.formatDecimal(item.lot, 0, 'COMMA', 2, 'POINT')}]]</span></td>
+                                                    <td><span th:inline="text">[[${#numbers.formatDecimal(item.equity, 0, 'COMMA', 2, 'POINT')}]]</span></td>
+
+                                                    <td th:switch="${true}">
+													    <span style="font-size: 14px; color: white" class="badge rounded-pill bg-success fs-1 fw-bold" th:case="${item.equity > item.balance}">Có lợi nhuận</span>
+													    <span style="font-size: 14px; color: white" class="badge rounded-pill bg-info fs-1 fw-bold" th:case="${item.equity < item.balance and item.equity / item.balance >= 0.8 and item.equity / item.balance < 0.9}">Đang âm (nguy cơ)</span>
+													    <span style="font-size: 14px; color: white" class="badge rounded-pill bg-danger fs-1 fw-bold" th:case="${item.equity < item.balance and item.equity / item.balance < 0.8}">Đang âm (nguy hiểm)</span>
+													    <span style="font-size: 14px; color: white" class="badge rounded-pill bg-warning fs-1 fw-bold" th:case="*" th:text="${'Đang âm (cảnh báo)'}"></span>
+													</td>
+				                                    <td>
+													    <button type="button" class="btn btn-primary waves-effect waves-light show-pie-chart" data-toggle="modal" data-target="#exampleModalCenter">
+													        Biểu đồ
+													    </button>
+													</td>
+                                                    <td>
+	                                                    <table class="table table-striped">
+		                                                    	<thead>
+					                                                <tr>
+					                                                    <th>Tên cặp tiền</th>
+					                                                    <th>Equity hiện tại</th>
+					                                                    <th>Nến hiện tại</th>
+					                                                    <th>Thời gian cập nhật</th>
+					                                                </tr>
+					                                            </thead>
+					                                            <tbody>
+					                                            	<tr th:each="currency : ${item.listData}">
+					                                            		<td><span th:text="${currency.name}"></span></td>
+					                                            		<td><span th:inline="text">[[${#numbers.formatDecimal(currency.value, 0, 'COMMA', 2, 'POINT')}]]</span></td>
+					                                            		<td><span th:text="${currency.candle}"></span></td>
+					                                            		<td><span th:text="${currency.time}"></span></td>
+					                                            	</tr>
+					                                            </tbody>
+	                                                    </table>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        
+                                    </div> <!-- end card body-->
+                                </div> <!-- end card -->
+                            </div><!-- end col-->
+                        </div>
+                        <!-- end row-->
+                    </div> <!-- container-fluid -->
+                </div>
+                <!-- End Page-content -->
+            </div>
+            <!-- end main content-->
+            <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="exampleModalCenterTitle">Biểu đồ dữ liệu</h5>
+                                                        <button type="button" class="close waves-effect waves-light" data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <!--<div class="chart" id="piechart-3d-chart">
+                                                        </div>
+                                                        -->
+                                                        <div class="chart" id="column-chart"></div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary waves-effect waves-light" data-dismiss="modal">Close</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+        </div>
+        <!-- END layout-wrapper -->
+
+
+        <!-- jQuery  -->
+        <script src="/js/jquery.min.js"></script>
+        <script src="/js/bootstrap.bundle.min.js"></script>
+        <script src="/js/waves.js"></script>
+        <script src="/js/simplebar.min.js"></script>
+
+        <!-- Sparkline Js-->
+        <script src="/plugins/jquery-sparkline/jquery.sparkline.min.js"></script>
+
+        <!-- Chart Js-->
+        <script src="/plugins/jquery-knob/jquery.knob.min.js"></script>
+
+        <!-- Chart Custom Js-->
+         <script src="/pages/knob-chart-demo.js"></script>
+
+        <!-- Morris Js-->
+        <script src="/plugins/morris-js/morris.min.js"></script>
+
+        <!-- Raphael Js-->
+        <script src="/plugins/raphael/raphael.min.js"></script>
+
+        <!-- Custom Js -->
+        <script th:inline="javascript">
+		    /*<![CDATA[*/
+		    var resultData = /*[[${result}]]*/ [];
+		    /*]]>*/
+		</script>
+		
+		
+        <script src="/pages/dashboard-demo.js"></script>
+        
+        <!-- third party js -->
+        <script src="/plugins/datatables/jquery.dataTables.min.js"></script>
+        <script src="/plugins/datatables/dataTables.bootstrap4.js"></script>
+        <script src="/plugins/datatables/dataTables.responsive.min.js"></script>
+        <script src="/plugins/datatables/responsive.bootstrap4.min.js"></script>
+        <script src="/plugins/datatables/dataTables.buttons.min.js"></script>
+        <script src="/plugins/datatables/buttons.bootstrap4.min.js"></script>
+        <script src="/plugins/datatables/buttons.html5.min.js"></script>
+        <script src="/plugins/datatables/buttons.flash.min.js"></script>
+        <script src="/plugins/datatables/buttons.print.min.js"></script>
+        <script src="/plugins/datatables/dataTables.keyTable.min.js"></script>
+        <script src="/plugins/datatables/dataTables.select.min.js"></script>
+        <script src="/plugins/datatables/pdfmake.min.js"></script>
+        <script src="/plugins/datatables/vfs_fonts.js"></script>
+        <!-- third party js ends -->
+
+        <!-- Datatables init -->
+        <script src="/pages/datatables-demo.js"></script>
+        <script src="/pages/google-chart-demo.js"></script>
+        <script src="https://www.gstatic.com/charts/loader.js"></script>
+
+        <!-- App js -->
+
+    </body>
+
+</html>
