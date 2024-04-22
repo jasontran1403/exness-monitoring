@@ -16,5 +16,8 @@ public class RealtimeConvertedDto {
 	private double balance;
 	private double lot;
 	private double equity;
+	private int magic1;
+	private int magic2;
+	private boolean isRunning;
 	private List<RealtimeItemDto> listData;
 }

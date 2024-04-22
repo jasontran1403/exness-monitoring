@@ -52,7 +52,9 @@
                     <div class="container-fluid">
                         <div class="row">
                             <div class="col-lg-12">
-
+														<a href="/logout" class="btn btn-success">
+                                                            <span>Logout</span>
+                                                        </a>
                                 <div class="card">
                                     <div class="card-body">
                                         <div class="row">
@@ -86,7 +88,7 @@
                                                     <th>Tổng vốn</th>
                                                     <th>Tổng LOT</th>
                                                     <th>Tổng equity</th>
-                                                    <th>Trạng thái</th>
+                                                    <th>Trạng thái equity</th>
                                                     <th></th>
                                                     <th></th>
                                                 </tr>
@@ -99,12 +101,28 @@
                                                     <td><span th:inline="text">[[${#numbers.formatDecimal(item.lot, 0, 'COMMA', 2, 'POINT')}]]</span></td>
                                                     <td><span th:inline="text">[[${#numbers.formatDecimal(item.equity, 0, 'COMMA', 2, 'POINT')}]]</span></td>
 
-                                                    <td th:switch="${true}">
-													    <span style="font-size: 14px; color: white" class="badge rounded-pill bg-success fs-1 fw-bold" th:case="${item.equity > item.balance}">Có lợi nhuận</span>
-													    <span style="font-size: 14px; color: white" class="badge rounded-pill bg-info fs-1 fw-bold" th:case="${item.equity < item.balance and item.equity / item.balance >= 0.8 and item.equity / item.balance < 0.9}">Đang âm (nguy cơ)</span>
-													    <span style="font-size: 14px; color: white" class="badge rounded-pill bg-danger fs-1 fw-bold" th:case="${item.equity < item.balance and item.equity / item.balance < 0.8}">Đang âm (nguy hiểm)</span>
-													    <span style="font-size: 14px; color: white" class="badge rounded-pill bg-warning fs-1 fw-bold" th:case="*" th:text="${'Đang âm (cảnh báo)'}"></span>
+                                                   <td th:switch="${true}">
+													    <span style="font-size: 14px; color: white" class="badge rounded-pill bg-success fs-1 fw-bold"
+													          th:case="${item.equity > item.balance}"
+													          th:if="${item.balance != 0}"
+													          th:text="${'+' + #numbers.formatDecimal((item.balance - item.equity)/item.balance*100*-1, 1, 'COMMA', 2, 'POINT') + ' %'}"></span>
+													
+													    <span style="font-size: 14px; color: white" class="badge rounded-pill bg-info fs-1 fw-bold"
+													          th:case="${item.equity < item.balance and item.equity / item.balance >= 0.8 and item.equity / item.balance < 0.9}"
+													          th:if="${item.balance != 0}"
+													          th:text="${'-' + #numbers.formatDecimal((item.balance - item.equity)/item.balance*100, 1, 'COMMA', 2, 'POINT') + ' %'}"></span>
+													
+													    <span style="font-size: 14px; color: white" class="badge rounded-pill bg-danger fs-1 fw-bold"
+													          th:case="${item.equity < item.balance and item.equity / item.balance < 0.8}"
+													          th:if="${item.balance != 0}"
+													          th:text="${'-' + #numbers.formatDecimal((item.balance - item.equity)/item.balance*100, 1, 'COMMA', 2, 'POINT') + ' %'}"></span>
+													
+													    <span style="font-size: 14px; color: white" class="badge rounded-pill bg-warning fs-1 fw-bold"
+													          th:case="*"
+													          th:if="${item.balance != 0}"
+													          th:text="${'-' + #numbers.formatDecimal((item.balance - item.equity)/item.balance*100, 1, 'COMMA', 2, 'POINT') + ' %'}"></span>
 													</td>
+
 				                                    <td>
 													    <button type="button" class="btn btn-primary waves-effect waves-light show-pie-chart" data-toggle="modal" data-target="#exampleModalCenter">
 													        Biểu đồ
@@ -117,6 +135,11 @@
 					                                                    <th>Tên cặp tiền</th>
 					                                                    <th>Equity hiện tại</th>
 					                                                    <th>Nến hiện tại</th>
+					                                                    <th>Số Lot khởi chạy</th>
+					                                                    <th>Spread khởi chạy</th>
+					                                                    <th>Magic 1</th>
+					                                                    <th>Magic 2</th>
+					                                                    <th>Trạng thái bot</th>
 					                                                    <th>Thời gian cập nhật</th>
 					                                                </tr>
 					                                            </thead>
@@ -125,6 +148,14 @@
 					                                            		<td><span th:text="${currency.name}"></span></td>
 					                                            		<td><span th:inline="text">[[${#numbers.formatDecimal(currency.value, 0, 'COMMA', 2, 'POINT')}]]</span></td>
 					                                            		<td><span th:text="${currency.candle}"></span></td>
+					                                            		<td><span th:text="${currency.lot}"></span></td>
+					                                            		<td><span th:text="${currency.spread}"></span></td>
+					                                            		<td><span th:text="${currency.magic1}"></span></td>
+					                                            		<td><span th:text="${currency.magic2}"></span></td>
+					                                            		<td>
+					                                            			<span th:if="${currency.isRunning == true}" class="btn btn-success rounded">Running</span>
+					                                            			<span th:if="${currency.isRunning == false}" class="btn btn-danger rounded">Stopped</span>
+																		</td>
 					                                            		<td><span th:text="${currency.time}"></span></td>
 					                                            	</tr>
 					                                            </tbody>

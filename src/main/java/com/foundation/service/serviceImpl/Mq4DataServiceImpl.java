@@ -48,6 +48,14 @@ public class Mq4DataServiceImpl implements Mq4DataService {
 				candle = "D1";
 			}
 			itemConvert.setCandle(candle);
+			itemConvert.setLot(item.getInitLot());
+			itemConvert.setSpread(item.getInitSpread());
+			itemConvert.setMagic1(item.getMagic1());
+			itemConvert.setMagic2(item.getMagic2());
+			long currentTimeUnix = System.currentTimeMillis()/1000;
+			boolean isRunning = item.getLastestUpdated() - currentTimeUnix < 10800 && item.isActived() && item.isRunning() ? true : false;
+			itemConvert.setRunning(isRunning);
+			
 			SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss dd-MM-yyyy");
 
 			// Chuyển đổi timestamp thành đối tượng Date
