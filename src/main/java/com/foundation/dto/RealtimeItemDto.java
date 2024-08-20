@@ -18,6 +18,13 @@ public class RealtimeItemDto {
 	private int type;
 	private int magic1;
 	private int magic2;
+	private double lotBuy;
+	private double largestLotBuy;
+	private double lotSell;
+	private double largestLotSell;
 	private boolean isRunning;
+	private double lotBuyDefault;
+	private double lotSellDefault;
+	private String version;
 	private String time;
 }

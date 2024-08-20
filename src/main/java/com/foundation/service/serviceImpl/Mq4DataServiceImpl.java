@@ -52,6 +52,13 @@ public class Mq4DataServiceImpl implements Mq4DataService {
 			itemConvert.setSpread(item.getInitSpread());
 			itemConvert.setMagic1(item.getMagic1());
 			itemConvert.setMagic2(item.getMagic2());
+			itemConvert.setLotBuy(item.getLotBuy());
+			itemConvert.setLargestLotBuy(item.getLargestLotBuy());
+			itemConvert.setLotSell(item.getLotSell());
+			itemConvert.setLargestLotSell(item.getLargestLotSell());
+			itemConvert.setLotBuyDefault(item.getLotBuyDefault());
+			itemConvert.setLotSellDefault(item.getLotSellDefault());
+			itemConvert.setVersion(item.getVersion());
 			long currentTimeUnix = System.currentTimeMillis()/1000;
 			boolean isRunning = item.getLastestUpdated() - currentTimeUnix < 10800 && item.isActived() && item.isRunning() ? true : false;
 			itemConvert.setRunning(isRunning);
@@ -83,7 +90,9 @@ public class Mq4DataServiceImpl implements Mq4DataService {
 		}
 
 		results.setExnessId(exnessId);
+		
 		results.setRealtimeData(dataItem);
+		
 
 		return results;
 	}

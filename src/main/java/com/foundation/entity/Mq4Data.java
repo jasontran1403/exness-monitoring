@@ -33,4 +33,11 @@ public class Mq4Data {
 	private int magic2;
 	private boolean isActived;
 	private boolean isRunning;
+	private double lotBuy;
+	private double lotSell;
+	private double largestLotBuy;
+	private double largestLotSell;
+	private double lotBuyDefault;
+	private double lotSellDefault;
+	private String version;
 }

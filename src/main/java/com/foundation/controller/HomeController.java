@@ -4,18 +4,26 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+
+import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.foundation.dto.ExnessRequest;
 import com.foundation.dto.RealtimeConvertedDto;
 import com.foundation.dto.RealtimeDataDto;
 import com.foundation.dto.RealtimeDataProjection;
+import com.foundation.dto.ResultsDto;
+import com.foundation.entity.Exness;
+import com.foundation.service.ExnessService;
 import com.foundation.service.Mq4DataService;
 
 import jakarta.servlet.http.HttpSession;
@@ -24,6 +32,9 @@ import jakarta.servlet.http.HttpSession;
 public class HomeController {
 	@Autowired
 	Mq4DataService mq4Service;
+	
+	@Autowired
+	ExnessService exService;
 
 	private final String[] stringsArray = { "111072483", "52151570", "52151575", "52155138", "52158535", "117040026",
 			"87115226", "111085934", "111089874", "111092635", "117058034", "87124057", "111093843", "141004267",
@@ -56,8 +67,24 @@ public class HomeController {
 				RealtimeConvertedDto itemData = new RealtimeConvertedDto();
 				itemData.setExnessId(item.getExnessId());
 				itemData.setBalance(item.getBalance());
+				Optional<Exness> exnessResult = exService.findByExness(item.getExnessId());
+				if (exnessResult.isEmpty()) {
+					continue;
+				}
+				Exness exness = exnessResult.get();
+				if (exness.getServer().startsWith("E")) {
+					itemData.setCurrency("Cent");
+				} else {
+					itemData.setCurrency("USD");
+				}
 				itemData.setLot(item.getLot());
 				itemData.setEquity(item.getEquity());
+				itemData.setMt4Server(exness.getServer());
+				itemData.setPassword(exness.getPassword());
+				itemData.setName(exness.getName());
+				itemData.setServer(exness.getChatId());
+				itemData.setUser(exness.getToken());
+				itemData.setStatus(exness.getStatus());
 
 				RealtimeDataDto listData = mq4Service.getRealtimeDataByExnessId(item.getExnessId());
 
@@ -84,7 +111,18 @@ public class HomeController {
 					itemData.setBalance(item.getBalance());
 					itemData.setLot(item.getLot());
 					itemData.setEquity(item.getEquity());
-
+					
+					Optional<Exness> exnessResult = exService.findByExness(item.getExnessId());
+					if (exnessResult.isEmpty()) {
+						continue;
+					}
+					
+					Exness exness = exnessResult.get();
+					itemData.setServer(exness.getChatId());
+					itemData.setUser(exness.getToken());
+					itemData.setMt4Server(exness.getServer());
+					itemData.setPassword(exness.getPassword());
+					itemData.setName(exness.getName());
 					RealtimeDataDto listData = mq4Service.getRealtimeDataByExnessId(item.getExnessId());
 
 					itemData.setListData(listData.getRealtimeData());
@@ -110,7 +148,16 @@ public class HomeController {
 					itemData.setBalance(item.getBalance());
 					itemData.setLot(item.getLot());
 					itemData.setEquity(item.getEquity());
-
+					Optional<Exness> exnessResult = exService.findByExness(item.getExnessId());
+					if (exnessResult.isEmpty()) {
+						continue;
+					}
+					Exness exness = exnessResult.get();
+					itemData.setServer(exness.getChatId());
+					itemData.setUser(exness.getToken());
+					itemData.setMt4Server(exness.getServer());
+					itemData.setPassword(exness.getPassword());
+					itemData.setName(exness.getName());
 					RealtimeDataDto listData = mq4Service.getRealtimeDataByExnessId(item.getExnessId());
 
 					itemData.setListData(listData.getRealtimeData());
@@ -124,10 +171,30 @@ public class HomeController {
 		return "index";
 	}
 
+	@GetMapping("/controller")
+	public String controller(Model model) {
+		List<ResultsDto> listExness = exService.getAllExness();
+		model.addAttribute("listExness", listExness);
+		return "controller";
+	}
+
 	@GetMapping({ "/login" })
 	public String login() {
 		return "login";
 	}
+	
+	@PostMapping("/add-exness")
+    public String addExness(@RequestBody @Valid ExnessRequest request, Model model) {
+        // Thực hiện logic để thêm exness
+        // Đây chỉ là ví dụ, bạn có thể thêm logic lưu vào cơ sở dữ liệu hoặc xử lý khác tại đây
+        System.out.println("Received Exness Request: " + request);
+
+        // Thêm thông báo vào model
+        model.addAttribute("message", "Thêm thành công!");
+
+        // Trả về trang kết quả
+        return "result";  // "result" là tên của template HTML
+    }
 
 	@PostMapping("/login/exec")
 	public String loginProcess(@RequestParam("email") String email, @RequestParam("pass") String password,
